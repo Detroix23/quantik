@@ -7,6 +7,4 @@ final public class Referee {
   public Referee(App app) {
     this.app = app;
   }
-
-  
 }

@@ -19,7 +19,13 @@ final class App {
    * General draw function for `App`.
    */
   public void draw() {
-    this.board.highlightTile(this.board.current_tile);
+    // Test.
+    if (!isUnsized(this.board.current_tile)) {
+      this.board.highlightColumn(this.board.current_tile);
+      this.board.highlightLine(this.board.current_tile);
+    }
+
+    this.board.highlightTile(this.board.current_tile, color(240, 240, 240));
     this.board.draw();
     this.player.draw();
     this.logger.drawHistory(5);

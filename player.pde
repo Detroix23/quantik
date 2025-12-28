@@ -39,15 +39,15 @@ final class Player {
    * Return the clicked board tile.
    */
   public Size click(Size position) {
-    Size tile = app.board.getTileOn(position.x, position.y);
+    Size tile = this.app.board.getTileOn(position.x, position.y);
     
     if (tile.x == -1 && tile.y == -1) { 
       return tile;
     }
     
-    app.board.table[tile.y][tile.x] = this.selected_piece;
-    
-    // Log
+    this.app.board.table[tile.y][tile.x] = this.selected_piece;
+
+    // Log.
     this.app.logger.newPlay(new Play(
       this.id, 
       this.selected_piece, 

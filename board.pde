@@ -87,13 +87,13 @@ final public class Board {
    * Highlight on the app the tile, by drawing a rectangle.
    * If `tile_position` is (-1; -1), draw nothing.
    */
-  public void highlightTile(Size tile_position) {
-    if (tile_position.x == -1 && tile_position.y == -1) {
+  public void highlightTile(Size tile_position, color fill_color) {
+    if (isUnsized(tile_position)) {
       return; 
     }
     
     rectMode(CORNER);
-    fill(240, 240, 240);
+    fill(fill_color);
     
     rect(
       tile_position.x * (this.draw_size.x / this.size.x),
@@ -137,6 +137,26 @@ final public class Board {
       this.table[square.y * 2 + 1][square.x * 2 + 1],
     };
   } 
+
+  public void highlightLine(Size tile) {
+    int[] line = this.getLine(tile.y);
+    for (int index = 0; index < line.length; index++) {
+      this.highlightTile(
+        new Size(index, tile.y), 
+        color(255, 60, 100, 50)
+      );
+    }
+  }
+
+  public void highlightColumn(Size tile) {
+    int[] column = this.getColumn(tile.x);
+    for (int index = 0; index < column.length; index++) {
+      this.highlightTile(
+        new Size(tile.x, index), 
+        color(100, 60, 255, 50)
+      );
+    }
+  }
 }
 
 /**
