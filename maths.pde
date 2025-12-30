@@ -1,6 +1,7 @@
 
 /**
  * Size class, containing a 2D rectangle.
+ * None is (-1; -1).
  */
 final public class Size {
   int x;
@@ -14,12 +15,12 @@ final public class Size {
   public String toString() {
     return String.format("Size(%d, %d)", this.x, this.y);
   }
-}
 
-/**
- * Return if the given `size` is (-1; -1)
- */
-public boolean isUnsized(Size size) {
-  return size.x == -1 && size.y == -1;
+  /**
+   * Return if the given `size` is (-1; -1)
+   */
+  public boolean isNone() {
+    return this.x == -1 && this.y == -1;
+  }
 }
 

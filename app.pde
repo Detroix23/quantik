@@ -6,28 +6,37 @@
  */
 final class App {
   Board board;
-  Player player;
+  Player[] players;
   Logger logger;
+  GameLoop game_loop;
+  Referee referee;
+
 
   public App(Size draw_size) {
     this.board = new Board(this, draw_size);
     this.logger = new Logger(this);
-    this.player = new Player(this, 1);
+    this.players = new Player[]{
+      new Player(this, 1),
+      new Player(this, 2),
+    };
+    this.game_loop = new GameLoop(this);
+    this.referee = new Referee(this);
   }
 
   /**
    * General draw function for `App`.
    */
   public void draw() {
-    // Test.
-    if (!isUnsized(this.board.current_tile)) {
+    if (!this.board.current_tile.isNone()) {
       this.board.highlightColumn(this.board.current_tile);
       this.board.highlightLine(this.board.current_tile);
+      this.board.highlightTile(this.board.current_tile, color(240, 240, 240));
     }
-
-    this.board.highlightTile(this.board.current_tile, color(240, 240, 240));
     this.board.draw();
-    this.player.draw();
-    this.logger.drawHistory(5);
+    this.game_loop.draw(new Size(20, 25));
+    for (Player player: this.players) {
+      player.draw(new Size(20, 50));
+    }
+    this.logger.drawHistory(5, new Size(20, 180));
   }
 }

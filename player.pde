@@ -2,7 +2,7 @@
  * Player class. Handle player game and interactions.
  */
 final class Player {
-  int id;
+  final int id;
   App app;
   int selected_piece;
   
@@ -15,21 +15,22 @@ final class Player {
   /**
    * Draw all the UI for useful information about the player.
    */
-  public void draw() {
+  public void draw(Size position) {
     // Draw `selected_piece`.
+    int height_shift = (this.id - 1) * 50;
     textSize(20);
     fill(200, 200, 200);
     
     text(
-      "Player 1",
-      this.app.board.draw_size.x + 20,
-      40
+      String.format("Player %d", this.id),
+      this.app.board.draw_size.x + position.x,
+      position.y + height_shift
     );
 
     text(
       String.format("- Selected: %d", this.selected_piece),
-      this.app.board.draw_size.x + 20,
-      60
+      this.app.board.draw_size.x + position.x,
+      position.y + 20 + height_shift
     );
   }
   
@@ -40,26 +41,46 @@ final class Player {
    */
   public Size click(Size position) {
     Size tile = this.app.board.getTileOn(position.x, position.y);
-    
-    if (tile.x == -1 && tile.y == -1) { 
+    if (tile.isNone()) { 
       return tile;
     }
-    
-    this.app.board.table[tile.y][tile.x] = this.selected_piece;
+    Piece new_piece = this.selected_piece == 0 
+      ? new Piece(0, 0) 
+      : new Piece(this.id, this.selected_piece);
 
-    // Log.
-    this.app.logger.newPlay(new Play(
-      this.id, 
-      this.selected_piece, 
-      tile
-    ));
-    println(
-      "player.Player.click - Updated tile (x, y):", position.x, position.y, 
-      ", to piece:", this.selected_piece
-    );
+    // Verifications.
+    if (this.app.referee.isTileOccupied(tile)) {
+      println(String.format("player.Player.click - Tile occupied on %s.", tile.toString()));
+
+    } else if (this.app.referee.isUselessPlay(new_piece, tile)) {
+      println(String.format("player.Player.click - Useless play of %s on %s.", new_piece.toString(), tile.toString()));
     
-    // End.
-    app.board.current_tile = tile;
+    } else if (this.app.referee.isIllegalPlay(new_piece, tile)) {
+      println(String.format("player.Player.click - Illegal play of %s on %s.", new_piece.toString(), tile.toString()));
+      
+    } else {
+      // Update board.
+      this.app.board.table[tile.y][tile.x] = new_piece;
+
+      // Log.
+      this.app.logger.newPlay(new Play(
+        this.id, 
+        this.selected_piece, 
+        tile
+      ));
+      println(
+        "player.Player.click - Updated tile (x, y):", position.x, position.y, 
+        ", to piece:", this.selected_piece
+      );
+
+      app.board.current_tile = tile;
+
+      if (this.app.referee.isWinning(tile)) {
+        println("\n*******\nWIN from player", this.id);
+      } else {
+        app.game_loop.turnPass();
+      }
+    }
 
     return tile;
   }
@@ -71,7 +92,7 @@ final class Player {
    */
   public int selectedPieceFromAscii(int code) {
     final int first_code = 48;
-    final int pieces = 8;
+    final int pieces = 4;
     if (code < first_code || code > (first_code + pieces)) {
       return -1;
     }

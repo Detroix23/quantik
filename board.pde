@@ -5,7 +5,7 @@
 final public class Board {
   App app;
   Size size;
-  int[][] table;
+  Piece[][] table;
   color lines_color;
   color piece_color;
   Size draw_size;
@@ -15,12 +15,7 @@ final public class Board {
   public Board(App app, Size draw_size) {
     this.app = app;
     this.size = new Size(4, 4);
-    this.table = new int[][]{
-      {0, 0, 0, 0},
-      {0, 0, 0, 0},
-      {0, 0, 0, 0},
-      {0, 0, 0, 0},
-    };
+    this.table = initializeEmptyBoard(this.size);
     this.draw_size = draw_size;
     this.lines_color = color(100, 100, 100);
     this.piece_color = color(12, 100, 100);
@@ -47,7 +42,7 @@ final public class Board {
     
     for (int y = 0; y < this.size.y; y++) {
       for (int x = 0; x < this.size.x; x++) {
-        drawNumber(
+        drawPiece(
           this.table[y][x],
           new Size(
             (int) ((x + 0.4) * (this.draw_size.x / this.size.x)),
@@ -60,7 +55,7 @@ final public class Board {
   
 
   /**
-   * Get the array-like coordinate of the tile where the on-screen cordinates couple (x; y) is.
+   * Get the array-like coordinate of the tile where the on-screen coordinates couple (x; y) is.
    * (-1; -1) is the escape value.
    */ 
   public Size getTileOn(int x, int y) { 
@@ -74,13 +69,12 @@ final public class Board {
       return new Size(-1, -1); 
     }
     
-    println("app.Size.getTileOn - (x, y) =", x / (this.draw_size.x / this.size.x), y / (this.draw_size.y / this.size.y));
+    println("board.Board.getTileOn - (x, y) =", x / (this.draw_size.x / this.size.x), y / (this.draw_size.y / this.size.y));
     
     return new Size(
       x / (this.draw_size.x / this.size.x),
       y / (this.draw_size.y / this.size.y)
     );
-    
   }
   
   /**
@@ -88,7 +82,7 @@ final public class Board {
    * If `tile_position` is (-1; -1), draw nothing.
    */
   public void highlightTile(Size tile_position, color fill_color) {
-    if (isUnsized(tile_position)) {
+    if (tile_position.isNone()) {
       return; 
     }
     
@@ -108,15 +102,15 @@ final public class Board {
   /**
    * Get the horizontal line on `y`. First line is of index 0.
    */
-  public int[] getLine(int y) {
+  public Piece[] getLine(int y) {
     return this.table[y];
   }
   
   /**
    * Get the vertical column on `x`. First column is of index 0.
    */
-  public int[] getColumn(int x) {
-    int[] column = {0, 0, 0, 0};
+  public Piece[] getColumn(int x) {
+    Piece[] column = new Piece[4];
     for (int y = 0; y < this.size.y; y++) {
       column[y] = this.table[y][x];
     }
@@ -127,10 +121,10 @@ final public class Board {
   /**
    * Get the square zone in which the `position` resides.
    */
-  public int[] getSquare(Size position) {
+  public Piece[] getSquare(Size position) {
     final Size square = new Size(position.x / 2, position.y / 2);
 
-    return new int[]{
+    return new Piece[]{
       this.table[square.y * 2][square.x * 2],
       this.table[square.y * 2][square.x * 2 + 1],
       this.table[square.y * 2 + 1][square.x * 2],
@@ -139,7 +133,7 @@ final public class Board {
   } 
 
   public void highlightLine(Size tile) {
-    int[] line = this.getLine(tile.y);
+    Piece[] line = this.getLine(tile.y);
     for (int index = 0; index < line.length; index++) {
       this.highlightTile(
         new Size(index, tile.y), 
@@ -149,7 +143,7 @@ final public class Board {
   }
 
   public void highlightColumn(Size tile) {
-    int[] column = this.getColumn(tile.x);
+    Piece[] column = this.getColumn(tile.x);
     for (int index = 0; index < column.length; index++) {
       this.highlightTile(
         new Size(tile.x, index), 
@@ -162,20 +156,28 @@ final public class Board {
 /**
  * Write in color according to the `number`.
  */
-public void drawNumber(int number, Size position) {
+public void drawPiece(Piece piece, Size position) {
   final color RED = color(255, 50, 25);
   final color BLUE = color(50, 25, 255);
   final color NEUTRAL = color(100, 100, 100);
 
-  if (number >= 1 && number <= 4) {
+  if (piece == null) {
+    fill(NEUTRAL);
+    text(0, position.x, position.y);
+
+  } else if (piece.player_id == 1) {
     fill(BLUE);
-  } else if (number >= 5 && number <= 8) {
+    text(piece.code, position.x, position.y);
+
+  } else if (piece.player_id == 2) {
     fill(RED);
+    text(piece.code, position.x, position.y);
+
   } else {
     fill(NEUTRAL);
-  }
+    text(piece.code, position.x, position.y);
 
-  text(number, position.x, position.y);
+  }
 
   return;
 }

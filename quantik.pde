@@ -23,9 +23,9 @@ void draw() {
 
 void mouseReleased() {
   println("quantik.mouseClicked - Heard!");
-  app.player.click(new Size(mouseX, mouseY));
+  app.game_loop.current_player.click(new Size(mouseX, mouseY));
 } 
 
 void keyReleased() {
-  app.player.selectedPieceFromAscii(key);
+  app.game_loop.current_player.selectedPieceFromAscii(key);
 } 

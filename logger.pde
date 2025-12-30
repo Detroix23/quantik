@@ -1,5 +1,5 @@
 /**
- * Strcuture storing information about 1 turn.
+ * Structure storing information about 1 turn.
  */
 final public class Play {
   int player_id;
@@ -41,13 +41,13 @@ final public class Logger {
    * Draw up to `records` number of lines, starting from top. 
    * 0 `records` prints all the history.
    */
-  public void drawHistory(int records) {
+  public void drawHistory(int records, Size position) {
     textSize(20);
 
     text(
       String.format("History(%d):",this.plays.size()),
-      this.app.board.draw_size.x + 20,
-      100
+      this.app.board.draw_size.x + position.x,
+      position.y
     );
 
     if (records == 0) {
@@ -62,8 +62,8 @@ final public class Logger {
       final Play play = this.plays.get(index); 
       text(
         String.format("%d: %s", index, play.toString()),
-        this.app.board.draw_size.x + 20,
-        100 + 21 * (this.plays.size() - index)
+        this.app.board.draw_size.x + position.x,
+        position.y + 20 * (this.plays.size() - index)
       );
     }
     
